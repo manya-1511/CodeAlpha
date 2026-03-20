@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>India Unemployment Analysis — AIML Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- ─── NOISE OVERLAY ─── -->
+  <div class="noise"></div>
+
+  <!-- ─── HEADER ─── -->
+  <header>
+    <div class="header-inner">
+      <div class="logo-block">
+        <span class="logo-dot"></span>
+        <div>
+          <p class="logo-label">AIML PROJECT</p>
+          <h1 class="logo-title">UnemploymentIQ</h1>
+        </div>
+      </div>
+      <nav>
+        <a href="#overview" class="nav-link active">Overview</a>
+        <a href="#predict" class="nav-link">Predictor</a>
+        <a href="#insights" class="nav-link">Insights</a>
+      </nav>
+      <div class="header-badge">
+        <span class="dot-live"></span> Live Model
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero" id="overview">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <p class="hero-eyebrow">India · 2019 – 2021 · 28 States</p>
+        <h2 class="hero-heading">
+          Decoding<br/>
+          <em>Unemployment</em><br/>
+          Through Data
+        </h2>
+        <p class="hero-sub">
+          A machine-learning driven analysis of India's unemployment landscape —
+          COVID-19 shocks, seasonal cycles, and state-level disparities.
+        </p>
+        <a href="#predict" class="btn-primary">Run Prediction ↓</a>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card accent-green">
+          <span class="kpi-label">Pre-COVID Avg</span>
+          <span class="kpi-value" id="kpi-precovid">8.3%</span>
+          <span class="kpi-delta">↓ Stable baseline</span>
+        </div>
+        <div class="kpi-card accent-red">
+          <span class="kpi-label">COVID Peak</span>
+          <span class="kpi-value" id="kpi-peak">23.5%</span>
+          <span class="kpi-delta">↑ +183% surge</span>
+        </div>
+        <div class="kpi-card accent-blue">
+          <span class="kpi-label">Post-COVID Avg</span>
+          <span class="kpi-value" id="kpi-postcovid">11.8%</span>
+          <span class="kpi-delta">↗ Partial recovery</span>
+        </div>
+        <div class="kpi-card accent-purple">
+          <span class="kpi-label">National Avg</span>
+          <span class="kpi-value" id="kpi-national">11.2%</span>
+          <span class="kpi-delta">⊙ Dataset mean</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CHARTS ─── -->
+  <section class="charts-section">
+    <div class="section-header">
+      <h3>Trend Analysis</h3>
+      <p>National unemployment rate across time with COVID-19 annotation</p>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card big">
+        <p class="chart-title">📈 Unemployment Rate Over Time</p>
+        <canvas id="trendChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <p class="chart-title">🗓️ Seasonal Pattern</p>
+        <canvas id="seasonalChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <p class="chart-title">🦠 COVID-19 Impact</p>
+        <canvas id="covidChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PREDICTOR ─── -->
+  <section class="predictor-section" id="predict">
+    <div class="predictor-inner">
+      <div class="predictor-left">
+        <p class="section-eyebrow">ML MODEL · Random Forest</p>
+        <h3 class="section-title">Predict<br/>Unemployment Rate</h3>
+        <p class="section-desc">
+          Enter parameters below. The trained <code>.pkl</code> model will return
+          a predicted unemployment rate and risk level.
+        </p>
+        <div class="model-badge">
+          <span>R² Score</span>
+          <strong>0.89</strong>
+        </div>
+        <div class="model-badge">
+          <span>Algorithm</span>
+          <strong>Random Forest · 200 Trees</strong>
+        </div>
+        <div class="model-badge">
+          <span>Training Data</span>
+          <strong>768 records · 28 states</strong>
+        </div>
+      </div>
+
+      <div class="predictor-right">
+        <div class="form-card">
+          <div class="form-group">
+            <label>State / Region</label>
+            <select id="stateSelect">
+              <option value="">-- Select State --</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Month</label>
+              <select id="monthSelect">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Year</label>
+              <select id="yearSelect">
+                <option value="2019">2019</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Labour Participation Rate (%)</label>
+            <div class="slider-wrap">
+              <input type="range" id="lprSlider" min="20" max="65" value="43" step="0.5"
+                     oninput="document.getElementById('lprVal').textContent = this.value + '%'"/>
+              <span id="lprVal">43%</span>
+            </div>
+          </div>
+
+          <button class="btn-predict" id="predictBtn" onclick="predict()">
+            <span id="btnText">Run Prediction</span>
+            <span id="btnLoader" class="hidden">⏳ Processing...</span>
+          </button>
+
+          <!-- Result Box -->
+          <div class="result-box hidden" id="resultBox">
+            <div class="result-header">
+              <span class="result-label">Predicted Unemployment Rate</span>
+              <span class="result-risk" id="resultRisk">—</span>
+            </div>
+            <div class="result-value" id="resultValue">—</div>
+            <p class="result-interp" id="resultInterp"></p>
+            <div class="result-bar-wrap">
+              <div class="result-bar" id="resultBar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── INSIGHTS ─── -->
+  <section class="insights-section" id="insights">
+    <div class="section-header">
+      <h3>Key Findings</h3>
+      <p>Insights derived from exploratory data analysis and model interpretation</p>
+    </div>
+    <div class="insights-grid">
+      <div class="insight-card">
+        <span class="insight-icon">🦠</span>
+        <h4>COVID-19 Shock</h4>
+        <p>April–May 2020 lockdown caused unemployment to spike from 8.3% to 23.5% — a 183% surge in just 60 days.</p>
+      </div>
+      <div class="insight-card">
+        <span class="insight-icon">📍</span>
+        <h4>Regional Disparity</h4>
+        <p>States like Tripura and Haryana show 3× higher unemployment than states like Gujarat and Odisha — rural vs urban divide.</p>
+      </div>
+      <div class="insight-card">
+        <span class="insight-icon">🗓️</span>
+        <h4>Seasonal Cycles</h4>
+        <p>April–June historically sees higher unemployment due to academic transitions and reduced agricultural activity.</p>
+      </div>
+      <div class="insight-card">
+        <span class="insight-icon">📊</span>
+        <h4>Labour Participation Key</h4>
+        <p>Labour participation rate is the strongest predictor of unemployment — drops in LPR signal economic withdrawal.</p>
+      </div>
+      <div class="insight-card">
+        <span class="insight-icon">📈</span>
+        <h4>Slow Recovery</h4>
+        <p>Post-COVID recovery stabilized at 11.8% — still 42% above the pre-COVID baseline, indicating structural damage.</p>
+      </div>
+      <div class="insight-card">
+        <span class="insight-icon">🌾</span>
+        <h4>Policy Recommendation</h4>
+        <p>Target skill-development in high-unemployment states; strengthen MGNREGA buffers for seasonal employment gaps.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>
+    <p>Built with Python · sklearn · Flask · Chart.js &nbsp;|&nbsp; Dataset: Kaggle — Unemployment in India</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
