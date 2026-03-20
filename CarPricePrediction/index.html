@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CarVal — ML Price Predictor</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark">◈</span>
+        <div>
+          <span class="brand-sub">ML PRICE ENGINE</span>
+          <span class="brand-name">CarVal</span>
+        </div>
+      </div>
+      <nav>
+        <a href="#hero" class="nav-link">Home</a>
+        <a href="#predictor" class="nav-link">Predict</a>
+        <a href="#analysis" class="nav-link">Analysis</a>
+      </nav>
+      <span class="status-chip"><span class="status-dot"></span>Random Forest · R²=0.95</span>
+    </div>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="hero-left">
+      <p class="eyebrow">USED CAR VALUATION · INDIA MARKET</p>
+      <h1 class="hero-h1">What's Your<br/><span>Car Worth</span><br/>Today?</h1>
+      <p class="hero-desc">ML-powered price prediction using brand goodwill, mileage, fuel type, age, and 6 other features — trained on 300+ real listings.</p>
+      <a href="#predictor" class="cta">Estimate Price →</a>
+    </div>
+    <div class="hero-right">
+      <div class="stat-stack">
+        <div class="stat-card">
+          <span class="stat-n">300+</span>
+          <span class="stat-l">Training Records</span>
+        </div>
+        <div class="stat-card highlight">
+          <span class="stat-n">0.95</span>
+          <span class="stat-l">R² Accuracy</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-n">4</span>
+          <span class="stat-l">Models Compared</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-n">7</span>
+          <span class="stat-l">Input Features</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="predictor-section" id="predictor">
+    <div class="predictor-wrap">
+      <div class="predictor-heading">
+        <p class="eyebrow">RANDOM FOREST MODEL · car_price_model.pkl</p>
+        <h2>Predict Resale Price</h2>
+        <p class="sub-desc">Fill in the car details. Our trained model runs inference via Flask API and returns the predicted resale value.</p>
+      </div>
+
+      <div class="predictor-body">
+        <div class="form-panel">
+          <div class="form-row">
+            <div class="fgroup">
+              <label>Present Market Price (Lakhs)</label>
+              <input type="number" id="presentPrice" placeholder="e.g. 8.5" min="0.5" max="100" step="0.1"/>
+            </div>
+            <div class="fgroup">
+              <label>Kilometres Driven</label>
+              <input type="number" id="kmsDriven" placeholder="e.g. 45000" min="0" step="100"/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="fgroup">
+              <label>Car Age (Years)</label>
+              <input type="number" id="carAge" placeholder="e.g. 5" min="0" max="30"/>
+            </div>
+            <div class="fgroup">
+              <label>Previous Owners</label>
+              <select id="owner">
+                <option value="0">0 — First Owner</option>
+                <option value="1">1 — Second Owner</option>
+                <option value="2">2 — Third Owner</option>
+                <option value="3">3+ Owners</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row three">
+            <div class="fgroup">
+              <label>Fuel Type</label>
+              <select id="fuelType">
+                <option value="Petrol">Petrol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="CNG">CNG</option>
+              </select>
+            </div>
+            <div class="fgroup">
+              <label>Seller Type</label>
+              <select id="sellerType">
+                <option value="Dealer">Dealer</option>
+                <option value="Individual">Individual</option>
+                <option value="Trustmark Dealer">Trustmark Dealer</option>
+              </select>
+            </div>
+            <div class="fgroup">
+              <label>Transmission</label>
+              <select id="transmission">
+                <option value="Manual">Manual</option>
+                <option value="Automatic">Automatic</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="predict-btn" id="predictBtn" onclick="runPredict()">
+            <span id="btnLabel">Calculate Resale Value</span>
+            <span id="btnSpin" class="hidden">Processing…</span>
+          </button>
+        </div>
+
+        <div class="result-panel" id="resultPanel">
+          <div class="result-placeholder" id="resultPlaceholder">
+            <span class="placeholder-icon">◈</span>
+            <p>Enter car details and click<br/>Calculate to see prediction</p>
+          </div>
+          <div class="result-content hidden" id="resultContent">
+            <p class="result-eyebrow">PREDICTED RESALE VALUE</p>
+            <div class="result-price" id="resultPrice">—</div>
+            <div class="result-segment" id="resultSegment">—</div>
+            <div class="result-meta">
+              <div class="meta-row">
+                <span>Market Price</span>
+                <strong id="metaPresent">—</strong>
+              </div>
+              <div class="meta-row">
+                <span>Depreciation</span>
+                <strong id="metaDeprec" class="red">—</strong>
+              </div>
+              <div class="meta-row">
+                <span>Segment</span>
+                <strong id="metaSegment">—</strong>
+              </div>
+            </div>
+            <div class="depr-bar-wrap">
+              <div class="depr-bar-fill" id="deprBar"></div>
+            </div>
+            <p class="depr-label">Retained value vs original price</p>
+            <p class="result-note" id="resultNote"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="analysis-section" id="analysis">
+    <div class="analysis-wrap">
+      <div class="section-head">
+        <p class="eyebrow">EXPLORATORY DATA ANALYSIS</p>
+        <h2>What Drives Car Prices?</h2>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-box wide">
+          <p class="chart-label">Avg Selling Price by Fuel Type</p>
+          <canvas id="fuelChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Transmission vs Avg Price</p>
+          <canvas id="transChart"></canvas>
+        </div>
+        <div class="chart-box wide">
+          <p class="chart-label">Feature Importance — Random Forest</p>
+          <canvas id="importanceChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Car Age vs Price (Depreciation Curve)</p>
+          <canvas id="ageChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="insights-section">
+    <div class="analysis-wrap">
+      <div class="section-head">
+        <p class="eyebrow">MODEL FINDINGS</p>
+        <h2>Key Insights</h2>
+      </div>
+      <div class="insights-grid">
+        <div class="ins-card">
+          <span class="ins-ico">⚙️</span>
+          <h4>Present Price Dominates</h4>
+          <p>Current market price is the #1 predictor — accounts for over 60% of model importance.</p>
+        </div>
+        <div class="ins-card">
+          <span class="ins-ico">📅</span>
+          <h4>Age Kills Value Fast</h4>
+          <p>Cars lose ~15–20% per year in the first 5 years. After 8 years, depreciation slows.</p>
+        </div>
+        <div class="ins-card">
+          <span class="ins-ico">⛽</span>
+          <h4>Diesel Commands Premium</h4>
+          <p>Diesel cars fetch 20–35% higher resale prices due to better mileage economics.</p>
+        </div>
+        <div class="ins-card">
+          <span class="ins-ico">🔄</span>
+          <h4>Automatic Premium</h4>
+          <p>Automatic transmission cars sell 25–40% higher than manual equivalents.</p>
+        </div>
+        <div class="ins-card">
+          <span class="ins-ico">👤</span>
+          <h4>First-Owner Premium</h4>
+          <p>First-owner cars are worth 12–18% more than second-owner equivalents.</p>
+        </div>
+        <div class="ins-card">
+          <span class="ins-ico">🏢</span>
+          <h4>Dealer Trust Markup</h4>
+          <p>Trustmark Dealer listings sell at a premium; Individual sellers offer negotiation room.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Built with Python · Random Forest · Flask · Chart.js &nbsp;|&nbsp; Dataset: Kaggle — Car Price Prediction (Used Cars)</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
